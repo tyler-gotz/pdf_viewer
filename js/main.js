@@ -8,23 +8,22 @@ let pageNumIsPending = null
 const scale = 1.5
 const canvas = document.querySelector('#pdf-render')
 const ctx = canvas.getContext('2d')
-
 // Render the page
-const renderPage = (num) => {
+const renderPage = function (num) {
     pageIsRendering = true
 
     //Get Page
-    pdfDoc.getPage(num).then((page) => {
-        const viewport = page.getViewport({ scale })
+    pdfDoc.getPage(num).then(function (page) {
+        const viewport = page.getViewport({ scale: scale })
         canvas.height = viewport.height
         canvas.width = viewport.width
 
         const renderCtx = {
             canvasContext: ctx,
-            viewport
+            viewport: viewport
         }
         
-        page.render(renderCtx).promise.then(() => {
+        page.render(renderCtx).promise.then(function () {
             pageIsRendering = false
 
             if (pageNumIsPending !== null) {
@@ -39,7 +38,7 @@ const renderPage = (num) => {
 }
 
 // Check for pages rendering
-const queueRenderPage = (num) => {
+const queueRenderPage = function (num) {
     if (pageNumIsPending) {
         pageNumIsPending = num
     } else {
@@ -48,7 +47,7 @@ const queueRenderPage = (num) => {
 }
 
 // Show prev Page
-const showPrevPage = () => {
+const showPrevPage = function () {
     if (pageNum <= 1) {
         return
     }
@@ -58,7 +57,7 @@ const showPrevPage = () => {
     queueRenderPage(pageNum)
 }
 
-const showNextPage = () => {
+const showNextPage = function () {
     if (pageNum >= pdfDoc.numPages) {
         return
     }
@@ -67,14 +66,14 @@ const showNextPage = () => {
 
     queueRenderPage(pageNum)
 }
-
+pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
 // Get Document
-pdfjsLib.getDocument(url).promise.then((doc) => {
+pdfjsLib.getDocument(url).promise.then(function (doc) {
     pdfDoc = doc
     document.querySelector('.page-count').textContent = pdfDoc.numPages
     renderPage(pageNum)
 })
-  .catch(err => {
+  .catch(function (err) {
       const div = document.createElement('div')
       div.className = 'error'
       div.appendChild(document.createTextNode(err.message))
